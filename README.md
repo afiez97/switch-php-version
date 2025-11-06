@@ -1,107 +1,121 @@
+## 🧠 PHP Switcher (v4.5.1)
 
-🧠 PHP Switcher (v4.1)
-Auto PHP Version Switcher + Installer Prompt 😄
-PHP Switcher ialah skrip Bash fleksibel untuk tukar versi PHP (CLI, Apache, dan Nginx) dengan mudah.
+Auto PHP Version Switcher + Installer Prompt. Tukar versi PHP (CLI, Apache, Nginx) dengan satu command — ringkas, laju, dan fun 🎉
 
-Kini ada installer yang akan tanya nama command custom, jadi tak terikat dengan afiez-switch sahaja 🎉
+Kini installer membenarkan anda pilih nama command sendiri (contoh: php-switch) supaya mudah diingat.
 
-✨ Ciri Utama
-✅ Tukar versi PHP dengan satu arahan
+---
 
-✅ Auto detect & restart Apache / Nginx
+## ✨ Ciri Utama
 
-✅ Senarai semua versi PHP yang dipasang
+- Tukar versi PHP dengan satu arahan (contoh: 8.2, 8.3)
+- Auto detect & restart Apache / Nginx (jika sedang berjalan)
+- Senarai semua versi PHP yang dipasang dan highlight versi aktif
+- Papar versi PHP aktif sekarang
+- Installer tanya nama command (customizable)
+- Animasi loading dengan emoji 😎
 
-✅ Papar versi PHP aktif sekarang
+Nota: Jika versi yang diminta belum dipasang, skrip akan cuba memasang pakej yang diperlukan menggunakan apt.
 
-✅ Installer tanya nama command (contoh: php-switch)
+---
 
-✅ Animasi emoji loading comel 😎
+## 🧩 Keperluan
 
-💾 Cara Pasang
-1️⃣ Clone repository:
-git clone https://github.com/<username>/php-switcher.git
-cd php-switcher
+- Sistem berasaskan Debian/Ubuntu (apt tersedia)
+- Akses sudo
+- Optional: Apache2 dan/atau Nginx (jika anda guna web server)
 
-2️⃣ Jalankan installer:
+---
+
+## 💾 Pemasangan
+
+1) Clone repo ini dan masuk ke foldernya:
+
+```bash
+git clone https://github.com/afiez97/switch-php-version.git
+cd switch-php-version
+```
+
+2) Jalankan installer dan pilih nama command (contoh: php-switch):
+
+```bash
 bash install-switch.sh
+```
 
-🧩 Skrip akan tanya:
-Masukkan nama command yang anda mahu (contoh: php-switch):
+Selepas selesai, anda boleh guna command pilihan anda dari mana-mana, contohnya php-switch.
 
-Masukkan nama pilihan anda, contohnya:
-php-switch
+---
 
-Selesai! 🎉
+## 🚀 Cara Guna (paling penting)
 
-🚀 Cara Guna
-🔁 Tukar versi PHP:
-php-switch 8.3
+Gantikan php-switch dengan nama command yang anda pilih semasa pemasangan.
 
-📋 Lihat semua versi PHP yang ada:
-php-switch list
+- Tukar versi PHP:
 
-🔎 Lihat versi aktif sekarang:
-php-switch current
+  ```bash
+  php-switch 8.3
+  ```
 
+- Senarai semua versi dan highlight yang aktif sekarang:
 
-💻 Contoh Output
+  ```bash
+  php-switch list
+  ```
+
+- Papar versi PHP aktif sekarang:
+
+  ```bash
+  php-switch current
+  ```
+
+---
+
+## 💻 Contoh Output (ringkas)
+
+```text
 🔁 Menukar PHP ke versi 8.3...
-⏳ Menukar PHP CLI ke versi 8.3...
 ✅ Menukar PHP CLI ke versi 8.3 selesai!
 🌐 Apache dikesan. Menukar modul PHP...
-🌀 Menonaktifkan modul php7.4...
-💫 Mengaktifkan modul php8.3...
-⚙ Restart Apache...
-✅ Restart Apache selesai!
+💫 Mengaktifkan modul php8.3
+✅ Apache berjaya dimulakan semula.
 🎉 PHP kini berjaya ditukar kepada versi: PHP 8.3.12 (cli)
 💡 Gunakan 'php -v' atau 'php-switch current' untuk sahkan versi semasa.
+```
 
+---
 
-📜 Fail Dalam Repo
-Fail	Fungsi
-install-switch.sh	Installer — tanya nama command dan setup automatik
-afiez-switch.sh	Skrip utama (boleh rename ikut command pilihan)
-README.md	Dokumentasi penggunaan dan pemasangan
+## 🧪 Cara Skrip Bekerja (ringkas)
 
+- CLI: update-alternatives akan diset ke /usr/bin/phpX.Y
+- Apache: a2dismod phpX lama → a2enmod phpX.Y → restart apache2 (hanya jika Apache aktif)
+- Nginx: hentikan servis php-fpm lain → enable/start phpX.Y-fpm → restart nginx (hanya jika Nginx aktif)
 
-⚙️ Kod: install-switch.sh
-#!/bin/bash
-# Installer untuk Auto PHP Switcher
-# Ditulis oleh Afiez 💻✨
+---
 
-echo "🧠 Selamat datang ke pemasang PHP Switcher!"
-read -p "Masukkan nama command yang anda mahu (contoh: php-switch): " CMD_NAME
+## 🔧 Penyelesaian Masalah
 
-if [ -z "$CMD_NAME" ]; then
-  echo "❌ Nama command tidak boleh kosong."
-  exit 1
-fi
+- Command tidak ditemui selepas install:
+  - Pastikan install-switch.sh berjaya dan command disalin ke /usr/local/bin.
+  - Sahkan dengan: `which php-switch` (atau nama command anda).
 
-TARGET="/usr/local/bin/$CMD_NAME"
+- Versi tidak tersenarai di list:
+  - Pastikan pakej phpX.Y dipasang. Skrip akan cuba `apt install phpX.Y ...` secara automatik jika belum ada.
 
-echo "📦 Menyalin skrip ke $TARGET..."
-sudo cp ./afiez-switch.sh "$TARGET"
+- Apache gagal restart (Syntax OK tiada):
+  - Jalankan `sudo apachectl configtest` dan baiki konfigurasi yang rosak, kemudian cuba semula.
 
-sudo chmod +x "$TARGET"
+---
 
-echo ""
-echo "✅ Selesai dipasang!"
-echo "Anda kini boleh guna dengan:"
-echo ""
-echo "   $CMD_NAME list"
-echo "   $CMD_NAME current"
-echo "   $CMD_NAME 8.3"
-echo ""
-echo "💡 Skrip disimpan di: $TARGET"
+## 📁 Struktur Repo
 
+- `install-switch.sh` — Installer: tanya nama command dan setup automatik
+- `afiez-switch.sh` — Skrip utama (dipasang ke /usr/local/bin/<nama-command>)
+- `README.md` — Dokumen ini
 
-🧩 Kod Utama: afiez-switch.sh
-(Fungsi penuh untuk tukar, list, dan semak versi PHP)
+---
 
-📄 Lihat skrip penuh di sini
+## 🧑‍💻 Kredit
 
-🧑‍💻 Dibuat oleh
-Afiez — Software Developer @ Olive Intelligence Sdn. Bhd.
+Ditulis oleh Afiez — Software Developer @ Olive Intelligence Sdn. Bhd.
 
-💌 mohdafiez7@gmail.com
+Hubungi: mohdafiez7@gmail.com
